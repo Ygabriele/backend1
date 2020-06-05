@@ -17,10 +17,10 @@ app.listen(port,function(){
 const identities = [
     {id:1, name: 'Yoan',lastname:'Gabriele',email:'yoan.gabriele@gmail.com', activated:'true'},
     {id:2, name: 'Carlos',lastname:'Garcia',email:'carlos.garcia@gmail.com', activated:'false'},
-    {id:1, name: 'Daniela',lastname:'Muller',email:'daniela.muller@gmail.com', activated:'true'},
-    {id:1, name: 'Federica',lastname:'Boticelli',email:'federica.boticelli@gmail.com', activated:'true'},
-    {id:1, name: 'Francisco',lastname:'Nicchitta',email:'francisco.nicchitta@gmail.com', activated:'true'},
-    {id:1, name: 'Denis',lastname:'Mittermayerele',email:'denis.mittermayer@gmail.com', activated:'false'},
+    {id:3, name: 'Daniela',lastname:'Muller',email:'daniela.muller@gmail.com', activated:'true'},
+    {id:4, name: 'Federica',lastname:'Boticelli',email:'federica.boticelli@gmail.com', activated:'true'},
+    {id:5, name: 'Francisco',lastname:'Nicchitta',email:'francisco.nicchitta@gmail.com', activated:'true'},
+    {id:6, name: 'Denis',lastname:'Mittermayerele',email:'denis.mittermayer@gmail.com', activated:'false'},
 
 ];
 
@@ -34,12 +34,29 @@ app.get('/',function(req,res){
 });
 
 
-//Respond with Arry of numbers on /api/numbers
+//Respond with Arry of identities on /api/identities
 
-app.get('/api/numbers',function(req,res){
+app.get('/api/identities',function(req,res){
 
-    res.send([1,2,3,4]);
+    res.send(identities);
 });
+
+
+//Given the identity id as parameter, respond with the identity details if it is found
+
+app.get('/api/identities/:id',function(req,res){
+    
+    const identity = identities.find(x=>x.id === parseInt(req.params.id))
+    
+    //not found
+    if (!identity) return res.status(404).send( 'The identity with the given id:'+ req.params.id +' ...was not found');
+    
+    //found
+    res.send(identity);
+});
+
+
+
 
 //Respond to POST request on the root route (/) on the app homepage
 
