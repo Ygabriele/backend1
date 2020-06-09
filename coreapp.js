@@ -1,5 +1,7 @@
 const express = require ('express');
+const cors = require('cors');
 const app = express();
+
 
 const port = process.env.PORT || 3000;
 
@@ -14,17 +16,85 @@ app.listen(port,function(){
 });
 
 
-// Object data structure for Identities 
 
-const identities = [
-    {id:1, name: 'Yoan',lastname:'Gabriele',email:'yoan.gabriele@gmail.com', activated:true},
-    {id:2, name: 'Carlos',lastname:'Garcia',email:'carlos.garcia@gmail.com', activated:false},
-    {id:3, name: 'Daniela',lastname:'Muller',email:'daniela.muller@gmail.com', activated:true},
-    {id:4, name: 'Federica',lastname:'Boticelli',email:'federica.boticelli@gmail.com', activated:true},
-    {id:5, name: 'Francisco',lastname:'Nicchitta',email:'francisco.nicchitta@gmail.com', activated:true},
-    {id:6, name: 'Denis',lastname:'Mittermayerele',email:'denis.mittermayer@gmail.com', activated:false},
+
+var corsOptions = {
+  origin: 'http://localhost:4200',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
+};
+
+app.use(cors(corsOptions));
+
+
+
+
+// Object data structure for accounts 
+
+const accounts = [
+    {id:0001, name: 'Yoan',lastname:'Gabriele',email:'yoan.gabriele@gmail.com', activated:true},
+    {id:0002, name: 'Carlos',lastname:'Garcia',email:'carlos.garcia@gmail.com', activated:false},
+    {id:0003, name: 'Daniela',lastname:'Muller',email:'daniela.muller@gmail.com', activated:true},
+    {id:0004, name: 'Federica',lastname:'Boticelli',email:'federica.boticelli@gmail.com', activated:true},
+    {id:0005, name: 'Francisco',lastname:'Nicchitta',email:'francisco.nicchitta@gmail.com', activated:true},
+    {id:0006, name: 'Denis',lastname:'Mittermayerele',email:'denis.mittermayer@gmail.com', activated:false},
 
 ];
+
+
+// 1 = Super admin
+// 2 = Admin
+// 3 = Operator read and write
+// 4 = Only read
+
+
+const sytemroles = [
+    {id:1, account: 0001,systemrole:1},
+    {id:2, account: 0002,systemrole:2},
+    {id:3, account: 0003,systemrole:1},
+    {id:4, account: 0004,systemrole:3},
+    {id:5, account: 0005,systemrole:1},
+    {id:6, account: 0006,systemrole:4},
+];
+
+
+
+
+const organizations = [
+    {id:1, name: 'E Wie Einfach', admins: [], agents: [], readers:[], Peers:[]},
+    {id:2, name: 'ENTEGA Strom', admins: [], agents: [], readers:[], Peers:[]},
+    {id:3, name: 'SimplyGreen', admins: [], agents: [], readers:[], Peers:[]},
+    {id:4, name: 'Vattenfall', admins: [], agents: [], readers:[], Peers:[]},
+    {id:5, name: 'Diehl Aviation', admins: [], agents: [], readers:[], Peers:[]},
+    {id:6, name: 'Airbus Commercial Aircraft', admins: [], agents: [], readers:[], Peers:[]},
+    {id:7, name: 'Airbus Defence and Space', admins: [], agents: [], readers:[], Peers:[]},
+    {id:8, name: 'Airbus Helicopters', admins: [], agents: [], readers:[], Peers:[]},
+    {id:9, name: 'ArianeGroup', admins: [], agents: [], readers:[], Peers:[]},
+    {id:9, name: 'ArianeGroup', admins: [], agents: [], readers:[], Peers:[]},
+    {id:10, name: 'European Space Agency', admins: [], agents: [], readers:[], Peers:[]}
+
+]
+
+
+
+const consortiums = [
+    {
+        id:1, 
+        name: 'AutoKab', 
+        admins: [],
+        members: [
+
+        ],
+        chanels:[
+
+        ],
+
+
+    },
+
+
+];
+
+
 
 
 
@@ -36,32 +106,32 @@ app.get('/',function(req,res){
 });
 
 
-//Respond with Arry of identities on /api/identities
+//Respond with Arry of accounts on /api/accounts
 
-app.get('/api/identities',function(req,res){
+app.get('/api/accounts',function(req,res){
 
-    res.send(identities);
+    res.send(accounts);
 });
 
 
-//Given the identity id as parameter, respond with the identity details if it is found
+//Given the account id as parameter, respond with the account details if it is found
 
-app.get('/api/identities/:id',function(req,res){
+app.get('/api/accounts/:id',function(req,res){
     
-    const identity = identities.find(x=>x.id === parseInt(req.params.id))
+    const account = accounts.find(x=>x.id === parseInt(req.params.id))
     
     //not found 404
-    if (!identity) return res.status(404).send( 'The identity with the given id:'+ req.params.id +' ...was not found');
+    if (!account) return res.status(404).send( 'The account with the given id:'+ req.params.id +' ...was not found');
     
     //found
-    res.send(identity);
+    res.send(account);
 });
 
 
 
-//Add a new identity using POST method, we need to validate the request body to be sure that the data sent inside the body is valid
+//Add a new account using POST method, we need to validate the request body to be sure that the data sent inside the body is valid
 
-app.post('/api/identities',function(req,res){
+app.post('/api/accounts',function(req,res){
     
     if (!req.body.name || !req.body.lastname){
         //Bad request 400
@@ -74,8 +144,8 @@ app.post('/api/identities',function(req,res){
 
     };
 
-    const newIdentity = {
-        id: identities.length + 1,
+    const newaccount = {
+        id: accounts.length + 1,
         name: req.body.name,
         lastname: req.body.lastname,
         email:req.body.email,
@@ -83,9 +153,9 @@ app.post('/api/identities',function(req,res){
     }
 
 
-    identities.push(newIdentity);
+    accounts.push(newaccount);
 
-    res.send(newIdentity);
+    res.send(newaccount);
 
 });
 
@@ -93,49 +163,49 @@ app.post('/api/identities',function(req,res){
 
 
 
-//Given the identity id as parameter, use PUT to activate an Identity if it is found
+//Given the account id as parameter, use PUT to activate an account if it is found
 
-app.put('/api/identities/activate/:id',function(req,res){
+app.put('/api/accounts/activate/:id',function(req,res){
     
-    const identity = identities.find(x=>x.id === parseInt(req.params.id))
+    const account = accounts.find(x=>x.id === parseInt(req.params.id))
     
     //not found 404
-    if (!identity) return res.status(404).send( 'The identity with the given id:'+ req.params.id +' ...was not found');
+    if (!account) return res.status(404).send( 'The account with the given id:'+ req.params.id +' ...was not found');
     
     //found
-    const index = identities.indexOf(identity);
-    if (identities[index].activated == false) { 
-        identities[index].activated = true;
-        return res.status(200).send( JSON.stringify(identity)  +'<br/>The identity with the given id:'+ req.params.id +' ...now is activated');
+    const index = accounts.indexOf(account);
+    if (accounts[index].activated == false) { 
+        accounts[index].activated = true;
+        return res.status(200).send( JSON.stringify(account)  +'<br/>The account with the given id:'+ req.params.id +' ...now is activated');
     }
-    if (identities[index].activated == true) { 
+    if (accounts[index].activated == true) { 
          //Bad request 400
-        return res.status(400).send( JSON.stringify(identity)  +'<br/>The identity with the given id:'+ req.params.id + ' ... was already activated, no change needs to be done');
+        return res.status(400).send( JSON.stringify(account)  +'<br/>The account with the given id:'+ req.params.id + ' ... was already activated, no change needs to be done');
     }
     
     
 });
 
 
-//Given the identity id as parameter, use PUT to deactivate an Identity if it is found
+//Given the account id as parameter, use PUT to deactivate an account if it is found
 
-app.put('/api/identities/deactivate/:id',function(req,res){
+app.put('/api/accounts/deactivate/:id',function(req,res){
     
-    const identity = identities.find(x=>x.id === parseInt(req.params.id))
+    const account = accounts.find(x=>x.id === parseInt(req.params.id))
     
     //not found 404
-    if (!identity) return res.status(404).send( 'The identity with the given id:'+ req.params.id +' ...was not found');
+    if (!account) return res.status(404).send( 'The account with the given id:'+ req.params.id +' ...was not found');
     
     //found
-    const index = identities.indexOf(identity);
-    if (identities[index].activated == true) { 
-        identities[index].activated = false;
-        return res.status(200).send( JSON.stringify(identity)  +'<br/>The identity with the given id:'+ req.params.id +' ...now is deactivated');
+    const index = accounts.indexOf(account);
+    if (accounts[index].activated == true) { 
+        accounts[index].activated = false;
+        return res.status(200).send( JSON.stringify(account)  +'<br/>The account with the given id:'+ req.params.id +' ...now is deactivated');
     }
 
-    if (identities[index].activated == false) { 
+    if (accounts[index].activated == false) { 
          //Bad request 400
-        return res.status(400).send( JSON.stringify(identity) +'<br/> The identity with the given id:'+ req.params.id + ' ... was already deactivated, no change needs to be done');
+        return res.status(400).send( JSON.stringify(account) +'<br/> The account with the given id:'+ req.params.id + ' ... was already deactivated, no change needs to be done');
     }
     
     
